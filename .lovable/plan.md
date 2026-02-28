@@ -1,76 +1,99 @@
 
-# 🎮 Game do Biel
+# Atualização do Game do Biel - Novas Funcionalidades
 
-App gamificado de responsabilidade diária para um adolescente de 12 anos, com visual moderno e colorido, estilo mobile-first.
+## 1. Novas Tabelas no Banco de Dados
 
----
+Criar 4 novas tabelas sem alterar as existentes. Adicionar campos `essential` e `category` na tabela `tasks`.
 
-## 1. Configuração do Banco de Dados (Supabase)
+**Tabela `rewards`** (Recompensas da Loja)
+- id (uuid, PK), name (text), points_required (int), type (text: individual/coletiva), active (boolean, default true)
 
-- **Tabela `tasks`**: tarefas-modelo com nome, pontos e dias da semana (seg-sex ou todos)
-- **Tabela `daily_tasks`**: instâncias diárias de cada tarefa, com status (pendente / aguardando / aprovado), data e hora de conclusão
-- **Tabela `user_data`**: perfil do jogador (avatar selecionado, streak atual, pontos acumulados)
-- **PIN da mãe**: armazenado de forma simples no banco para validação de acesso
+**Tabela `redemptions`** (Resgates)
+- id (uuid, PK), reward_id (uuid, FK -> rewards), date (timestamptz), status (text: pendente/aprovado, default pendente), points_spent (int)
 
----
+**Tabela `weekly_missions`** (Missao Semanal)
+- id (uuid, PK), description (text), goal (int), current_progress (int, default 0), active (boolean, default true), completed (boolean, default false), week_start (date)
 
-## 2. Tela Principal (Biel)
+**Tabela `achievements`** (Conquistas/Badges)
+- id (uuid, PK), name (text), description (text), criteria (text), unlocked (boolean, default false), unlocked_at (timestamptz)
 
-- **Header gamificado**: avatar com moldura colorida, nome do nível atual, pontos do mês
-- **Barra de progresso do dia** animada mostrando tarefas concluídas vs total
-- **Contador regressivo** até as 21h com visual de timer
-- **Lista de tarefas** com cards coloridos por status:
-  - 🔴 Vermelho = pendente
-  - 🟡 Amarelo = aguardando aprovação da mãe
-  - 🟢 Verde = aprovado
-- Botão "Concluí!" em cada tarefa pendente
-- **Frase motivacional** aleatória no topo
-- **Indicador de streak** (dias consecutivos completos)
+**Alteracao na tabela `tasks`:**
+- Adicionar coluna `essential` (boolean, default false)
+- Adicionar coluna `category` (text, default 'geral')
 
----
+Todas com RLS public (mesmo padrão das tabelas existentes).
 
-## 3. Tela da Mãe (acesso por PIN de 4 dígitos)
+## 2. Loja de Recompensas
 
-- Tela de digitação de PIN para entrar
-- **Lista de tarefas aguardando aprovação** com botão "Aprovar" em cada uma
-- **Gráfico semanal** de desempenho (barras com pontos por dia)
-- **Percentual mensal** com barra de progresso e indicador da faixa de recompensa (R$60 / R$50 / R$40)
-- **Visualização de streak** atual e melhor streak
+**Nova rota `/loja`** com componente `RewardShop.tsx`:
+- Lista de recompensas disponíveis com pontos necessários
+- Botão "Resgatar" que cria um registro em `redemptions` com status "pendente"
+- Indicador visual de pontos disponíveis vs necessários
 
----
+**Na tela da mãe:** nova seção "Resgates Pendentes" com botão aprovar (desconta pontos do player_data ao aprovar)
 
-## 4. Sistema de Pontuação
+**Novos hooks:** `useRewards`, `useRedemptions`, `useRequestRedemption`, `useApproveRedemption`
 
-Tarefas pré-configuradas com seus pontos:
-| Tarefa | Pontos | Dias |
-|---|---|---|
-| Tarefa da escola | 20 | Seg-Sex |
-| Banho manhã | 10 | Todos |
-| Banho noite | 10 | Todos |
-| Escovar dentes manhã | 5 | Todos |
-| Escovar dentes noite | 5 | Todos |
-| Arrumar quarto | 15 | Todos |
-| Lavar louça | 15 | Todos |
-| Guardar louça | 10 | Todos |
-| Encher garrafas | 10 | Todos |
+## 3. Missão da Semana
 
-Meta mensal: 2400 pontos com recompensas proporcionais.
+**Na tela principal:** card mostrando missão ativa com barra de progresso (ex: "Complete 5 dias esta semana - 3/5")
 
----
+**Novos hooks:** `useActiveWeeklyMission`, `useUpdateMissionProgress`
 
-## 5. Sistema de Níveis e Streaks
+Progresso atualizado automaticamente quando tarefas essenciais do dia são todas aprovadas.
 
-- **Níveis** a cada 500 pontos: Iniciante → Guardião da Rotina → Mestre da Disciplina → Braço Direito → Lenda da Casa
-- **Bônus de streak**: 3 dias = +30pts, 7 dias = +100pts, 15 dias = título especial
-- Lógica de reset de streak às 21h se dia não completado
+## 4. Sistema de Conquistas (Badges)
 
----
+**Na tela principal:** seção "Minhas Conquistas" mostrando badges desbloqueados e bloqueados (com ícone de cadeado)
 
-## 6. Design Visual
+**Conquistas iniciais inseridas via migration:**
+- "3 Dias Seguidos" (streak >= 3)
+- "7 Dias Seguidos" (streak >= 7)
+- "100% Escola na Semana" (todas tarefas escola aprovadas seg-sex)
+- "10 Dias Completos no Mes" (10+ dias com todas essenciais aprovadas)
 
-- Cores vibrantes com gradientes (roxo, azul, verde)
-- Cards com sombras suaves e bordas arredondadas
-- Animações na barra de progresso e ao aprovar tarefas
-- Emojis e ícones lúdicos
-- Layout 100% responsivo para celular
-- Seleção de avatar entre opções pré-definidas (emojis de personagens)
+**Novos hooks:** `useAchievements`, `useCheckAchievements`
+
+Verificacao de conquistas executada ao aprovar tarefas.
+
+## 5. Notificacoes Motivacionais
+
+Usar `sonner` (toast) para notificacoes no app baseadas em hora:
+- **8h:** "Missoes do dia liberadas!"
+- **17h:** "Como esta o progresso hoje?"
+- **20h30:** "Ultima chamada antes das 21h!"
+- **18h sem tarefas:** "Ei, ainda da tempo!"
+
+Implementado via `useEffect` com checagem de hora no `Index.tsx`.
+
+## 6. Tarefas Dinamicas (Tela da Mae)
+
+**Na tela da mae:** botao "Nova Missao" que abre dialog com formulario:
+- Nome, Emoji, Pontos, Categoria, Periodicidade (all/weekdays/weekend/once), Essencial (sim/nao)
+
+Inserir diretamente na tabela `tasks` e invalidar queries.
+
+**Logica de "dia completo":** dia so conta como completo se todas tarefas com `essential=true` estiverem aprovadas.
+
+## 7. Arquivos a Criar/Modificar
+
+| Arquivo | Acao |
+|---|---|
+| Migration SQL | Criar tabelas + alterar tasks |
+| `src/hooks/useGameData.ts` | Adicionar hooks para rewards, redemptions, missions, achievements |
+| `src/pages/Index.tsx` | Adicionar secoes de missao semanal, conquistas, notificacoes |
+| `src/pages/MomDashboard.tsx` | Adicionar resgates pendentes + formulario nova tarefa |
+| `src/pages/RewardShop.tsx` | Nova pagina da loja |
+| `src/components/game/WeeklyMission.tsx` | Componente missao semanal |
+| `src/components/game/AchievementBadges.tsx` | Componente conquistas |
+| `src/components/game/CreateTaskDialog.tsx` | Dialog criar tarefa |
+| `src/components/game/RedemptionCard.tsx` | Card de resgate pendente |
+| `src/App.tsx` | Adicionar rota /loja |
+| `src/lib/game-constants.ts` | Adicionar conquistas default |
+
+## Detalhes Tecnicos
+
+- Todas tabelas novas seguem o padrao existente: RLS public, uuid PK com gen_random_uuid()
+- Hooks seguem padrao react-query existente em useGameData.ts
+- Notificacoes sao client-side (toast baseado em hora), sem push notifications
+- Nenhuma tabela ou campo existente sera removido
