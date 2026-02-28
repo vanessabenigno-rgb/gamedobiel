@@ -13,13 +13,16 @@ import {
   useWeeklyData,
   usePlayerData,
 } from "@/hooks/useGameData";
+import { usePendingRedemptions } from "@/hooks/useRewards";
+import { RedemptionCard } from "@/components/game/RedemptionCard";
+import { CreateTaskDialog } from "@/components/game/CreateTaskDialog";
 import { MONTHLY_GOAL, getRewardTier } from "@/lib/game-constants";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis } from "recharts";
 
 export default function MomDashboard() {
   const navigate = useNavigate();
@@ -33,6 +36,7 @@ export default function MomDashboard() {
   const { data: monthlyPoints } = useMonthlyPoints();
   const { data: weeklyData } = useWeeklyData();
   const { data: player } = usePlayerData();
+  const { data: pendingRedemptions } = usePendingRedemptions();
 
   const handlePinComplete = (value: string) => {
     setPin(value);
@@ -94,6 +98,9 @@ export default function MomDashboard() {
           <h1 className="font-extrabold text-xl">👩 Painel da Mãe</h1>
         </div>
 
+        {/* Create Task */}
+        <CreateTaskDialog />
+
         {/* Pending Approvals */}
         <Card>
           <CardHeader className="pb-3">
@@ -128,6 +135,26 @@ export default function MomDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Pending Redemptions */}
+        {pendingRedemptions && pendingRedemptions.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">🎁 Resgates Pendentes ({pendingRedemptions.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {pendingRedemptions.map((r) => (
+                <RedemptionCard
+                  key={r.id}
+                  id={r.id}
+                  rewardName={r.rewards?.name || "Recompensa"}
+                  pointsSpent={r.points_spent}
+                  date={r.date}
+                />
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Monthly Progress */}
         <Card>

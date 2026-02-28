@@ -1,17 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlayerHeader } from "@/components/game/PlayerHeader";
 import { CountdownTimer } from "@/components/game/CountdownTimer";
 import { TaskCard } from "@/components/game/TaskCard";
 import { DayProgress } from "@/components/game/DayProgress";
+import { WeeklyMission } from "@/components/game/WeeklyMission";
+import { AchievementBadges } from "@/components/game/AchievementBadges";
 import { Button } from "@/components/ui/button";
-import { Shield } from "lucide-react";
+import { Shield, ShoppingBag } from "lucide-react";
 import {
   useDailyTasks,
   usePlayerData,
   useMonthlyPoints,
   useEnsureDailyTasks,
 } from "@/hooks/useGameData";
+import { toast } from "sonner";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -19,10 +22,44 @@ const Index = () => {
   const { data: player } = usePlayerData();
   const { data: monthlyPoints } = useMonthlyPoints();
   const ensureTasks = useEnsureDailyTasks();
+  const notifiedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     ensureTasks.mutate();
   }, []);
+
+  // Motivational notifications based on time
+  useEffect(() => {
+    const checkNotifications = () => {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+
+      const key = `${h}:${m < 30 ? "0" : "30"}`;
+      if (notifiedRef.current.has(key)) return;
+
+      if (h === 8 && m < 5) {
+        toast("🌅 Missões do dia liberadas!", { description: "Bora começar o dia!" });
+        notifiedRef.current.add(key);
+      } else if (h === 17 && m < 5) {
+        toast("📊 Como está o progresso hoje?", { description: "Dá uma olhada nas tarefas!" });
+        notifiedRef.current.add(key);
+      } else if (h === 20 && m >= 25 && m <= 35) {
+        toast("⏰ Última chamada antes das 21h!", { description: "Corre que ainda dá tempo!" });
+        notifiedRef.current.add(key);
+      } else if (h === 18 && m < 5) {
+        const pending = dailyTasks?.filter((t) => t.status === "pending").length || 0;
+        if (pending > 0) {
+          toast("💪 Ei, ainda dá tempo!", { description: `Você tem ${pending} tarefas pendentes.` });
+          notifiedRef.current.add(key);
+        }
+      }
+    };
+
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 60000);
+    return () => clearInterval(interval);
+  }, [dailyTasks]);
 
   const approvedCount = dailyTasks?.filter((t) => t.status === "approved").length || 0;
   const totalCount = dailyTasks?.length || 0;
@@ -44,6 +81,9 @@ const Index = () => {
         {/* Day Progress */}
         <DayProgress completed={approvedCount} total={totalCount} />
 
+        {/* Weekly Mission */}
+        <WeeklyMission />
+
         {/* Tasks */}
         <div>
           <h2 className="font-extrabold text-lg mb-3">🎯 Tarefas de Hoje</h2>
@@ -64,10 +104,20 @@ const Index = () => {
             </div>
           )}
         </div>
+
+        {/* Achievements */}
+        <AchievementBadges />
       </div>
 
-      {/* FAB for mom */}
-      <div className="fixed bottom-6 right-6">
+      {/* FABs */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-3">
+        <Button
+          onClick={() => navigate("/loja")}
+          size="icon"
+          className="w-14 h-14 rounded-full bg-game-warning shadow-xl"
+        >
+          <ShoppingBag className="w-6 h-6" />
+        </Button>
         <Button
           onClick={() => navigate("/mae")}
           size="icon"

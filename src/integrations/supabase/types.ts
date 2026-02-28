@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          criteria: string
+          description: string
+          id: string
+          name: string
+          unlocked: boolean
+          unlocked_at: string | null
+        }
+        Insert: {
+          criteria: string
+          description: string
+          id?: string
+          name: string
+          unlocked?: boolean
+          unlocked_at?: string | null
+        }
+        Update: {
+          criteria?: string
+          description?: string
+          id?: string
+          name?: string
+          unlocked?: boolean
+          unlocked_at?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           id: string
@@ -97,10 +124,68 @@ export type Database = {
         }
         Relationships: []
       }
+      redemptions: {
+        Row: {
+          date: string
+          id: string
+          points_spent: number
+          reward_id: string
+          status: string
+        }
+        Insert: {
+          date?: string
+          id?: string
+          points_spent: number
+          reward_id: string
+          status?: string
+        }
+        Update: {
+          date?: string
+          id?: string
+          points_spent?: number
+          reward_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards: {
+        Row: {
+          active: boolean
+          id: string
+          name: string
+          points_required: number
+          type: string
+        }
+        Insert: {
+          active?: boolean
+          id?: string
+          name: string
+          points_required: number
+          type?: string
+        }
+        Update: {
+          active?: boolean
+          id?: string
+          name?: string
+          points_required?: number
+          type?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
+          category: string
           created_at: string
           emoji: string
+          essential: boolean
           id: string
           name: string
           points: number
@@ -108,8 +193,10 @@ export type Database = {
           weekdays: string
         }
         Insert: {
+          category?: string
           created_at?: string
           emoji?: string
+          essential?: boolean
           id?: string
           name: string
           points: number
@@ -117,13 +204,45 @@ export type Database = {
           weekdays?: string
         }
         Update: {
+          category?: string
           created_at?: string
           emoji?: string
+          essential?: boolean
           id?: string
           name?: string
           points?: number
           sort_order?: number
           weekdays?: string
+        }
+        Relationships: []
+      }
+      weekly_missions: {
+        Row: {
+          active: boolean
+          completed: boolean
+          current_progress: number
+          description: string
+          goal: number
+          id: string
+          week_start: string
+        }
+        Insert: {
+          active?: boolean
+          completed?: boolean
+          current_progress?: number
+          description: string
+          goal: number
+          id?: string
+          week_start?: string
+        }
+        Update: {
+          active?: boolean
+          completed?: boolean
+          current_progress?: number
+          description?: string
+          goal?: number
+          id?: string
+          week_start?: string
         }
         Relationships: []
       }
