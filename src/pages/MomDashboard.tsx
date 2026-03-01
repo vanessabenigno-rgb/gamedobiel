@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Gift } from "lucide-react";
 import {
   usePendingApprovals,
   useApproveTask,
@@ -98,8 +98,17 @@ export default function MomDashboard() {
           <h1 className="font-extrabold text-xl">👩 Painel da Mãe</h1>
         </div>
 
-        {/* Create Task */}
-        <CreateTaskDialog />
+        {/* Actions */}
+        <div className="grid grid-cols-2 gap-2">
+          <CreateTaskDialog />
+          <Button
+            onClick={() => navigate("/mae/recompensas")}
+            variant="outline"
+            className="font-bold"
+          >
+            <Gift className="w-4 h-4 mr-2" /> Gerenciar Recompensas
+          </Button>
+        </div>
 
         {/* Pending Approvals */}
         <Card>
