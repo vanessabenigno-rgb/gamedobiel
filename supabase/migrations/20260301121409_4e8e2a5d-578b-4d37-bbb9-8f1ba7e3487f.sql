@@ -1,0 +1,1 @@
+CREATE POLICY "Rewards are publicly deletable" ON public.rewards FOR DELETE USING (true);
