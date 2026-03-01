@@ -16,6 +16,20 @@ export function useRewards() {
   });
 }
 
+export function useAllRewards() {
+  return useQuery({
+    queryKey: ["all_rewards"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("rewards")
+        .select("*")
+        .order("points_required");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 export function useRedemptions() {
   return useQuery({
     queryKey: ["redemptions"],
@@ -65,14 +79,12 @@ export function useApproveRedemption() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ redemptionId, pointsSpent }: { redemptionId: string; pointsSpent: number }) => {
-      // Update redemption status
       const { error: redError } = await supabase
         .from("redemptions")
         .update({ status: "aprovado" })
         .eq("id", redemptionId);
       if (redError) throw redError;
 
-      // Deduct points from player
       const { data: player } = await supabase
         .from("player_data")
         .select("id, total_points")
@@ -89,6 +101,48 @@ export function useApproveRedemption() {
       queryClient.invalidateQueries({ queryKey: ["redemptions"] });
       queryClient.invalidateQueries({ queryKey: ["pending_redemptions"] });
       queryClient.invalidateQueries({ queryKey: ["player_data"] });
+    },
+  });
+}
+
+export function useCreateReward() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (reward: { name: string; points_required: number; type: string }) => {
+      const { error } = await supabase.from("rewards").insert(reward);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rewards"] });
+      queryClient.invalidateQueries({ queryKey: ["all_rewards"] });
+    },
+  });
+}
+
+export function useUpdateReward() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; points_required?: number; type?: string; active?: boolean }) => {
+      const { error } = await supabase.from("rewards").update(updates).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rewards"] });
+      queryClient.invalidateQueries({ queryKey: ["all_rewards"] });
+    },
+  });
+}
+
+export function useDeleteReward() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("rewards").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rewards"] });
+      queryClient.invalidateQueries({ queryKey: ["all_rewards"] });
     },
   });
 }
