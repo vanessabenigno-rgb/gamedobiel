@@ -8,13 +8,6 @@ const badgeIcons: Record<string, typeof Flame> = {
   monthly_10: Medal,
 };
 
-const badgeColors: Record<string, string> = {
-  streak_3: "text-neon-yellow",
-  streak_7: "text-neon-cyan",
-  school_week: "text-neon-green",
-  monthly_10: "text-neon-pink",
-};
-
 export function AchievementBadges() {
   const { data: achievements } = useAchievements();
 
@@ -22,33 +15,32 @@ export function AchievementBadges() {
 
   return (
     <div>
-      <h2 className="font-display font-bold text-sm tracking-wider mb-3 flex items-center gap-2">
-        <Medal className="w-5 h-5 text-neon-yellow" />
-        CONQUISTAS
+      <h2 className="font-display font-bold text-sm mb-3 flex items-center gap-2">
+        <Medal className="w-4 h-4 text-game-warning" />
+        Conquistas
       </h2>
       <div className="grid grid-cols-2 gap-2">
         {achievements.map((a) => {
           const Icon = badgeIcons[a.criteria] || Medal;
-          const color = badgeColors[a.criteria] || "text-neon-purple";
           return (
             <div
               key={a.id}
-              className={`flex items-center gap-2 p-3 rounded-xl border ${
+              className={`flex items-center gap-2.5 p-3 rounded-xl border transition-colors ${
                 a.unlocked
-                  ? `border-primary/30 glass-card ${a.criteria === "streak_7" ? "neon-glow-cyan" : "neon-glow-purple"}`
-                  : "bg-muted/30 border-border/50 opacity-50"
+                  ? "bg-primary/5 border-primary/20"
+                  : "bg-card border-border opacity-50"
               }`}
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${a.unlocked ? "bg-muted/50" : "bg-muted/30"}`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${a.unlocked ? "bg-primary/10" : "bg-muted"}`}>
                 {a.unlocked ? (
-                  <Icon className={`w-4 h-4 ${color}`} />
+                  <Icon className="w-4 h-4 text-primary" />
                 ) : (
-                  <Lock className="w-4 h-4 text-muted-foreground" />
+                  <Lock className="w-3.5 h-3.5 text-muted-foreground" />
                 )}
               </div>
               <div>
-                <p className="font-bold text-[11px]">{a.name}</p>
-                <p className="text-[9px] text-muted-foreground">{a.description}</p>
+                <p className="font-semibold text-[11px]">{a.name}</p>
+                <p className="text-[10px] text-muted-foreground">{a.description}</p>
               </div>
             </div>
           );

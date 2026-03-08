@@ -12,29 +12,28 @@ interface TaskCardProps {
 
 const statusConfig = {
   pending: {
-    bg: "border-l-neon-pink bg-neon-pink/5",
+    bg: "bg-card border-border hover:border-primary/30",
     icon: CircleDot,
-    iconColor: "text-neon-pink",
-    label: "PENDENTE",
-    glow: "neon-glow-pink",
+    iconColor: "text-muted-foreground",
+    label: "Pendente",
+    dot: "bg-muted-foreground",
   },
   waiting: {
-    bg: "border-l-neon-yellow bg-neon-yellow/5",
+    bg: "bg-card border-game-warning/20",
     icon: Clock,
-    iconColor: "text-neon-yellow",
-    label: "AGUARDANDO",
-    glow: "",
+    iconColor: "text-game-warning",
+    label: "Aguardando",
+    dot: "bg-game-warning",
   },
   approved: {
-    bg: "border-l-neon-green bg-neon-green/5",
+    bg: "bg-primary/5 border-primary/20",
     icon: Check,
-    iconColor: "text-neon-green",
-    label: "APROVADO",
-    glow: "neon-glow-green",
+    iconColor: "text-primary",
+    label: "Aprovado",
+    dot: "bg-primary",
   },
 };
 
-// Map emoji to Lucide icons
 const emojiToIcon: Record<string, typeof Droplets> = {
   "🚿": Droplets,
   "🛁": Bath,
@@ -53,16 +52,16 @@ export function TaskCard({ id, name, emoji, points, status }: TaskCardProps) {
   const TaskIcon = emojiToIcon[emoji] || Sparkles;
 
   return (
-    <div className={`flex items-center gap-3 p-4 rounded-xl border-l-4 border border-border/50 ${config.bg} ${config.glow} animate-slide-up`}>
-      <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center">
-        <TaskIcon className={`w-5 h-5 ${config.iconColor}`} />
+    <div className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors ${config.bg} animate-slide-up`}>
+      <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+        <TaskIcon className="w-4 h-4 text-foreground/70" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-sm truncate">{name}</p>
+        <p className="font-semibold text-sm truncate">{name}</p>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <StatusIcon className={`w-3 h-3 ${config.iconColor}`} />
-          <span className={`text-[10px] font-display font-bold tracking-wider ${config.iconColor}`}>{config.label}</span>
-          <span className="text-[10px] text-neon-purple font-display font-bold ml-auto">+{points} XP</span>
+          <div className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+          <span className="text-[11px] text-muted-foreground">{config.label}</span>
+          <span className="text-[11px] font-semibold text-primary ml-auto">+{points} XP</span>
         </div>
       </div>
       {status === "pending" && (
@@ -70,9 +69,9 @@ export function TaskCard({ id, name, emoji, points, status }: TaskCardProps) {
           size="sm"
           onClick={() => completeTask.mutate(id)}
           disabled={completeTask.isPending}
-          className="gradient-primary text-primary-foreground font-display font-bold text-[10px] tracking-wider rounded-xl px-4 shadow-md neon-glow-purple"
+          className="gradient-primary text-primary-foreground font-semibold text-xs rounded-lg px-3 h-8"
         >
-          CONCLUÍ!
+          Concluí!
         </Button>
       )}
     </div>
