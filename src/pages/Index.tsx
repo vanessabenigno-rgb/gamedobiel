@@ -7,7 +7,7 @@ import { DayProgress } from "@/components/game/DayProgress";
 import { WeeklyMission } from "@/components/game/WeeklyMission";
 import { AchievementBadges } from "@/components/game/AchievementBadges";
 import { Button } from "@/components/ui/button";
-import { Shield, ShoppingBag } from "lucide-react";
+import { ShieldCheck, ShoppingCart, Crosshair } from "lucide-react";
 import {
   useDailyTasks,
   usePlayerData,
@@ -29,7 +29,6 @@ const Index = () => {
     ensureTasks.mutate();
   }, []);
 
-  // Request notification permission on first visit
   useEffect(() => {
     if (permission === "default") {
       const timer = setTimeout(() => requestPermission(), 3000);
@@ -37,13 +36,11 @@ const Index = () => {
     }
   }, [permission, requestPermission]);
 
-  // Motivational notifications based on time
   useEffect(() => {
     const checkNotifications = () => {
       const now = new Date();
       const h = now.getHours();
       const m = now.getMinutes();
-
       const key = `${h}:${m < 30 ? "0" : "30"}`;
       if (notifiedRef.current.has(key)) return;
 
@@ -56,23 +53,13 @@ const Index = () => {
         sendNotification("📊 Como está o progresso hoje?", "Dá uma olhada nas tarefas!");
         notifiedRef.current.add(key);
       } else if (h === 20 && m >= 25 && m <= 35) {
-        sendNotification(
-          "⏰ Última chamada antes das 21h!",
-          pending > 0
-            ? `Ainda faltam ${pending} tarefas! Corre que ainda dá tempo!`
-            : "Corre que ainda dá tempo!"
-        );
+        sendNotification("⏰ Última chamada antes das 21h!", pending > 0 ? `Ainda faltam ${pending} tarefas!` : "Corre que ainda dá tempo!");
         notifiedRef.current.add(key);
-      } else if (h === 18 && m < 5) {
-        if (pending > 0) {
-          sendNotification("💪 Ei, ainda dá tempo!", `Você tem ${pending} tarefas pendentes.`);
-          notifiedRef.current.add(key);
-        }
+      } else if (h === 18 && m < 5 && pending > 0) {
+        sendNotification("💪 Ei, ainda dá tempo!", `Você tem ${pending} tarefas pendentes.`);
+        notifiedRef.current.add(key);
       } else if (h >= 19 && h < 21 && m < 5 && pending > 0) {
-        sendNotification(
-          "🚨 Prazo se aproximando!",
-          `Faltam ${pending} tarefas e menos de ${21 - h}h para o prazo!`
-        );
+        sendNotification("🚨 Prazo se aproximando!", `Faltam ${pending} tarefas e menos de ${21 - h}h!`);
         notifiedRef.current.add(key);
       }
     };
@@ -88,7 +75,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-24">
       <div className="max-w-md mx-auto px-4 py-6 space-y-4">
-        {/* Header */}
         <PlayerHeader
           avatar={player?.avatar || "🦸"}
           totalPoints={player?.total_points || 0}
@@ -96,20 +82,17 @@ const Index = () => {
           streak={player?.current_streak || 0}
         />
 
-        {/* Countdown */}
         <CountdownTimer />
-
-        {/* Day Progress */}
         <DayProgress completed={approvedCount} total={totalCount} />
-
-        {/* Weekly Mission */}
         <WeeklyMission />
 
-        {/* Tasks */}
         <div>
-          <h2 className="font-extrabold text-lg mb-3">🎯 Tarefas de Hoje</h2>
+          <h2 className="font-display font-bold text-sm tracking-wider mb-3 flex items-center gap-2">
+            <Crosshair className="w-5 h-5 text-neon-pink" />
+            TAREFAS DE HOJE
+          </h2>
           {loadingTasks ? (
-            <div className="text-center py-8 text-muted-foreground">Carregando...</div>
+            <div className="text-center py-8 text-muted-foreground font-display text-xs tracking-wider">CARREGANDO...</div>
           ) : (
             <div className="space-y-3">
               {dailyTasks?.map((dt) => (
@@ -126,7 +109,6 @@ const Index = () => {
           )}
         </div>
 
-        {/* Achievements */}
         <AchievementBadges />
       </div>
 
@@ -135,16 +117,16 @@ const Index = () => {
         <Button
           onClick={() => navigate("/loja")}
           size="icon"
-          className="w-14 h-14 rounded-full bg-game-warning shadow-xl"
+          className="w-14 h-14 rounded-full gradient-warning shadow-xl neon-glow-pink"
         >
-          <ShoppingBag className="w-6 h-6" />
+          <ShoppingCart className="w-6 h-6" />
         </Button>
         <Button
           onClick={() => navigate("/mae")}
           size="icon"
           className="w-14 h-14 rounded-full gradient-primary shadow-xl animate-pulse-glow"
         >
-          <Shield className="w-6 h-6" />
+          <ShieldCheck className="w-6 h-6" />
         </Button>
       </div>
     </div>

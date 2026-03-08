@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Clock } from "lucide-react";
+import { Timer, AlertTriangle } from "lucide-react";
 
 export function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState("");
   const [isExpired, setIsExpired] = useState(false);
+  const [isUrgent, setIsUrgent] = useState(false);
 
   useEffect(() => {
     const update = () => {
@@ -12,8 +13,9 @@ export function CountdownTimer() {
       deadline.setHours(21, 0, 0, 0);
 
       if (now >= deadline) {
-        setTimeLeft("Encerrado!");
+        setTimeLeft("ENCERRADO");
         setIsExpired(true);
+        setIsUrgent(false);
         return;
       }
 
@@ -23,6 +25,7 @@ export function CountdownTimer() {
       const s = Math.floor((diff % 60000) / 1000);
       setTimeLeft(`${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`);
       setIsExpired(false);
+      setIsUrgent(h < 2);
     };
 
     update();
@@ -31,10 +34,24 @@ export function CountdownTimer() {
   }, []);
 
   return (
-    <div className={`flex items-center justify-center gap-2 rounded-xl py-3 px-4 font-bold text-lg ${isExpired ? "bg-destructive/10 text-destructive" : "bg-secondary/10 text-secondary"}`}>
-      <Clock className="w-5 h-5" />
-      <span className="font-mono">{timeLeft}</span>
-      <span className="text-sm font-normal opacity-70">até 21h</span>
+    <div className={`relative flex items-center justify-center gap-3 rounded-xl py-3 px-4 border ${
+      isExpired 
+        ? "border-destructive/40 bg-destructive/10 neon-glow-pink" 
+        : isUrgent
+        ? "border-neon-yellow/40 bg-neon-yellow/5 neon-glow-pink"
+        : "border-neon-cyan/30 bg-neon-cyan/5 neon-glow-cyan"
+    }`}>
+      {isUrgent && !isExpired ? (
+        <AlertTriangle className="w-5 h-5 text-neon-yellow animate-glow-pulse" />
+      ) : (
+        <Timer className={`w-5 h-5 ${isExpired ? "text-destructive" : "text-neon-cyan"}`} />
+      )}
+      <span className={`font-display font-bold text-xl tracking-[0.15em] ${
+        isExpired ? "text-destructive" : isUrgent ? "text-neon-yellow neon-text-cyan" : "text-neon-cyan neon-text-cyan"
+      }`}>
+        {timeLeft}
+      </span>
+      <span className="text-xs font-body text-muted-foreground">até 21h</span>
     </div>
   );
 }
