@@ -27,7 +27,6 @@ export function sendNotification(title: string, body: string) {
         body,
         icon: "/favicon.ico",
         tag: title,
-        renotify: true,
       });
     } catch {
       if (navigator.serviceWorker?.ready) {
@@ -36,7 +35,6 @@ export function sendNotification(title: string, body: string) {
             body,
             icon: "/favicon.ico",
             tag: title,
-            renotify: true,
           });
         });
       }
