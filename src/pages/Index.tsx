@@ -14,7 +14,7 @@ import {
   useMonthlyPoints,
   useEnsureDailyTasks,
 } from "@/hooks/useGameData";
-import { toast } from "sonner";
+import { useNotificationPermission, sendNotification } from "@/hooks/useNotifications";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -23,10 +23,19 @@ const Index = () => {
   const { data: monthlyPoints } = useMonthlyPoints();
   const ensureTasks = useEnsureDailyTasks();
   const notifiedRef = useRef<Set<string>>(new Set());
+  const { permission, requestPermission } = useNotificationPermission();
 
   useEffect(() => {
     ensureTasks.mutate();
   }, []);
+
+  // Request notification permission on first visit
+  useEffect(() => {
+    if (permission === "default") {
+      const timer = setTimeout(() => requestPermission(), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [permission, requestPermission]);
 
   // Motivational notifications based on time
   useEffect(() => {
@@ -38,21 +47,33 @@ const Index = () => {
       const key = `${h}:${m < 30 ? "0" : "30"}`;
       if (notifiedRef.current.has(key)) return;
 
+      const pending = dailyTasks?.filter((t) => t.status === "pending").length || 0;
+
       if (h === 8 && m < 5) {
-        toast("🌅 Missões do dia liberadas!", { description: "Bora começar o dia!" });
+        sendNotification("🌅 Missões do dia liberadas!", "Bora começar o dia!");
         notifiedRef.current.add(key);
       } else if (h === 17 && m < 5) {
-        toast("📊 Como está o progresso hoje?", { description: "Dá uma olhada nas tarefas!" });
+        sendNotification("📊 Como está o progresso hoje?", "Dá uma olhada nas tarefas!");
         notifiedRef.current.add(key);
       } else if (h === 20 && m >= 25 && m <= 35) {
-        toast("⏰ Última chamada antes das 21h!", { description: "Corre que ainda dá tempo!" });
+        sendNotification(
+          "⏰ Última chamada antes das 21h!",
+          pending > 0
+            ? `Ainda faltam ${pending} tarefas! Corre que ainda dá tempo!`
+            : "Corre que ainda dá tempo!"
+        );
         notifiedRef.current.add(key);
       } else if (h === 18 && m < 5) {
-        const pending = dailyTasks?.filter((t) => t.status === "pending").length || 0;
         if (pending > 0) {
-          toast("💪 Ei, ainda dá tempo!", { description: `Você tem ${pending} tarefas pendentes.` });
+          sendNotification("💪 Ei, ainda dá tempo!", `Você tem ${pending} tarefas pendentes.`);
           notifiedRef.current.add(key);
         }
+      } else if (h >= 19 && h < 21 && m < 5 && pending > 0) {
+        sendNotification(
+          "🚨 Prazo se aproximando!",
+          `Faltam ${pending} tarefas e menos de ${21 - h}h para o prazo!`
+        );
+        notifiedRef.current.add(key);
       }
     };
 
