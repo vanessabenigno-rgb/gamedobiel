@@ -26,19 +26,15 @@ export function sendNotification(title: string, body: string) {
       new Notification(title, {
         body,
         icon: "/favicon.ico",
-        badge: "/favicon.ico",
-        vibrate: [200, 100, 200],
-        tag: title, // prevents duplicate notifications
+        tag: title,
         renotify: true,
       });
     } catch {
-      // Fallback for environments where Notification constructor fails (some mobile browsers)
       if (navigator.serviceWorker?.ready) {
         navigator.serviceWorker.ready.then((reg) => {
           reg.showNotification(title, {
             body,
             icon: "/favicon.ico",
-            vibrate: [200, 100, 200],
             tag: title,
             renotify: true,
           });
