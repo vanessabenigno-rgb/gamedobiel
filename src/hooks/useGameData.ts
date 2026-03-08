@@ -184,6 +184,13 @@ export function useApproveTask() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (dailyTaskId: string) => {
+      // Get task points before approving
+      const { data: dailyTask } = await supabase
+        .from("daily_tasks")
+        .select("*, tasks(points)")
+        .eq("id", dailyTaskId)
+        .single();
+
       const { error } = await supabase
         .from("daily_tasks")
         .update({
@@ -192,12 +199,29 @@ export function useApproveTask() {
         })
         .eq("id", dailyTaskId);
       if (error) throw error;
+
+      // Add points to player_data
+      const taskPoints = dailyTask?.tasks?.points || 0;
+      if (taskPoints > 0) {
+        const { data: player } = await supabase
+          .from("player_data")
+          .select("id, total_points")
+          .limit(1)
+          .single();
+        if (player) {
+          await supabase
+            .from("player_data")
+            .update({ total_points: player.total_points + taskPoints })
+            .eq("id", player.id);
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["daily_tasks"] });
       queryClient.invalidateQueries({ queryKey: ["pending_approvals"] });
       queryClient.invalidateQueries({ queryKey: ["monthly_points"] });
       queryClient.invalidateQueries({ queryKey: ["weekly_data"] });
+      queryClient.invalidateQueries({ queryKey: ["player_data"] });
     },
   });
 }
