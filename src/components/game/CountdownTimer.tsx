@@ -13,7 +13,7 @@ export function CountdownTimer() {
       deadline.setHours(21, 0, 0, 0);
 
       if (now >= deadline) {
-        setTimeLeft("ENCERRADO");
+        setTimeLeft("Encerrado");
         setIsExpired(true);
         setIsUrgent(false);
         return;
@@ -34,24 +34,24 @@ export function CountdownTimer() {
   }, []);
 
   return (
-    <div className={`relative flex items-center justify-center gap-3 rounded-xl py-3 px-4 border ${
+    <div className={`flex items-center justify-center gap-3 rounded-xl py-3 px-4 border ${
       isExpired 
-        ? "border-destructive/40 bg-destructive/10 neon-glow-pink" 
+        ? "border-destructive/30 bg-destructive/5" 
         : isUrgent
-        ? "border-neon-yellow/40 bg-neon-yellow/5 neon-glow-pink"
-        : "border-neon-cyan/30 bg-neon-cyan/5 neon-glow-cyan"
+        ? "border-game-warning/30 bg-game-warning/5"
+        : "border-border bg-card"
     }`}>
       {isUrgent && !isExpired ? (
-        <AlertTriangle className="w-5 h-5 text-neon-yellow animate-glow-pulse" />
+        <AlertTriangle className="w-4 h-4 text-game-warning" />
       ) : (
-        <Timer className={`w-5 h-5 ${isExpired ? "text-destructive" : "text-neon-cyan"}`} />
+        <Timer className={`w-4 h-4 ${isExpired ? "text-destructive" : "text-muted-foreground"}`} />
       )}
-      <span className={`font-display font-bold text-xl tracking-[0.15em] ${
-        isExpired ? "text-destructive" : isUrgent ? "text-neon-yellow neon-text-cyan" : "text-neon-cyan neon-text-cyan"
+      <span className={`font-mono font-bold text-lg tracking-widest ${
+        isExpired ? "text-destructive" : isUrgent ? "text-game-warning" : "text-foreground"
       }`}>
         {timeLeft}
       </span>
-      <span className="text-xs font-body text-muted-foreground">até 21h</span>
+      <span className="text-xs text-muted-foreground">até 21h</span>
     </div>
   );
 }

@@ -11,20 +11,13 @@ export default function RewardShop() {
   const { data: rewards, isLoading } = useRewards();
   const { data: player } = usePlayerData();
   const requestRedemption = useRequestRedemption();
-
   const totalPoints = player?.total_points || 0;
 
   const handleRedeem = (rewardId: string, pointsRequired: number, name: string) => {
-    if (totalPoints < pointsRequired) {
-      toast.error("XP insuficiente!");
-      return;
-    }
-    requestRedemption.mutate(
-      { rewardId, pointsSpent: pointsRequired },
-      {
-        onSuccess: () => toast.success(`Resgate de "${name}" solicitado! Aguarde aprovação.`),
-      }
-    );
+    if (totalPoints < pointsRequired) { toast.error("XP insuficiente!"); return; }
+    requestRedemption.mutate({ rewardId, pointsSpent: pointsRequired }, {
+      onSuccess: () => toast.success(`Resgate de "${name}" solicitado! Aguarde aprovação.`),
+    });
   };
 
   return (
@@ -34,50 +27,44 @@ export default function RewardShop() {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="font-display font-bold text-sm tracking-wider flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-neon-yellow" />
-            LOJA DE RECOMPENSAS
+          <h1 className="font-display font-bold text-sm flex items-center gap-2">
+            <ShoppingCart className="w-4 h-4 text-primary" /> Loja de Recompensas
           </h1>
         </div>
 
-        <Card className="gradient-primary neon-glow-purple border-0">
+        <Card className="gradient-primary border-0">
           <CardContent className="flex items-center gap-3 py-4">
-            <Coins className="w-6 h-6 text-neon-yellow" />
+            <Coins className="w-5 h-5 text-primary-foreground/80" />
             <div>
-              <p className="text-xs text-primary-foreground/80 font-display tracking-wider">SEUS XP</p>
-              <p className="text-2xl font-display font-extrabold text-primary-foreground">{totalPoints}</p>
+              <p className="text-xs text-primary-foreground/70">Seus XP</p>
+              <p className="text-2xl font-display font-bold text-primary-foreground">{totalPoints}</p>
             </div>
           </CardContent>
         </Card>
 
         {isLoading ? (
-          <div className="text-center py-8 text-muted-foreground font-display text-xs tracking-wider">CARREGANDO...</div>
+          <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {rewards?.map((r) => {
               const canAfford = totalPoints >= r.points_required;
               return (
-                <Card key={r.id} className={`glass-card border ${canAfford ? "border-neon-cyan/20" : "border-border/30 opacity-50"}`}>
-                  <CardContent className="flex items-center gap-3 py-4">
-                    <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center">
-                      <Gift className={`w-5 h-5 ${canAfford ? "text-neon-cyan" : "text-muted-foreground"}`} />
+                <Card key={r.id} className={`border ${canAfford ? "border-border" : "border-border/50 opacity-50"}`}>
+                  <CardContent className="flex items-center gap-3 py-3.5">
+                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+                      <Gift className="w-4 h-4 text-foreground/70" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-bold text-sm">{r.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-display font-bold text-neon-purple tracking-wider">{r.points_required} XP</span>
-                        <span className="text-[9px] bg-muted/50 px-2 py-0.5 rounded-full font-display tracking-wider">
-                          {r.type === "individual" ? "INDIVIDUAL" : "COLETIVA"}
+                      <p className="font-semibold text-sm">{r.name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[11px] font-semibold text-primary">{r.points_required} XP</span>
+                        <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md text-muted-foreground">
+                          {r.type === "individual" ? "Individual" : "Coletiva"}
                         </span>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      onClick={() => handleRedeem(r.id, r.points_required, r.name)}
-                      disabled={!canAfford || requestRedemption.isPending}
-                      className="rounded-xl font-display font-bold text-[10px] tracking-wider gradient-primary neon-glow-purple"
-                    >
-                      RESGATAR
+                    <Button size="sm" onClick={() => handleRedeem(r.id, r.points_required, r.name)} disabled={!canAfford || requestRedemption.isPending} className="rounded-lg font-semibold text-xs gradient-primary h-8 px-3">
+                      Resgatar
                     </Button>
                   </CardContent>
                 </Card>

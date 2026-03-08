@@ -11,20 +11,20 @@ export function WeeklyMission() {
   const percent = Math.round((mission.current_progress / mission.goal) * 100);
 
   return (
-    <Card className={`border ${mission.completed ? "border-neon-green/40 neon-glow-green" : "border-neon-purple/30 neon-glow-purple"} bg-card/80 backdrop-blur-sm`}>
+    <Card className={`border ${mission.completed ? "border-primary/30 bg-primary/5" : "border-border"}`}>
       <CardContent className="pt-4 pb-4">
         <div className="flex items-center gap-2 mb-2">
-          <Target className={`w-5 h-5 ${mission.completed ? "text-neon-green" : "text-neon-purple"}`} />
-          <h3 className="font-display font-bold text-xs tracking-wider">MISSÃO DA SEMANA</h3>
+          <Target className={`w-4 h-4 ${mission.completed ? "text-primary" : "text-muted-foreground"}`} />
+          <h3 className="font-semibold text-sm">Missão da Semana</h3>
           {mission.completed && (
-            <span className="ml-auto flex items-center gap-1 text-neon-green font-display font-bold text-[10px] tracking-wider">
-              <Trophy className="w-3 h-3" /> CONCLUÍDA
+            <span className="ml-auto flex items-center gap-1 text-primary text-xs font-semibold">
+              <Trophy className="w-3 h-3" /> Concluída
             </span>
           )}
         </div>
         <p className="text-sm text-muted-foreground mb-2">{mission.description}</p>
-        <Progress value={Math.min(100, percent)} className="h-2 mb-1" />
-        <p className="text-[10px] text-muted-foreground text-right font-display tracking-wider">
+        <Progress value={Math.min(100, percent)} className="h-1.5 mb-1" />
+        <p className="text-[11px] text-muted-foreground text-right">
           {mission.current_progress}/{mission.goal} dias
         </p>
       </CardContent>

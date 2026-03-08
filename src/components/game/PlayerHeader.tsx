@@ -3,7 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { AVATARS } from "@/lib/game-constants";
 import { useUpdateAvatar } from "@/hooks/useGameData";
-import { Zap, TrendingUp, Flame } from "lucide-react";
+import { TrendingUp, Flame } from "lucide-react";
 
 interface PlayerHeaderProps {
   avatar: string;
@@ -20,58 +20,49 @@ export function PlayerHeader({ avatar, totalPoints, monthlyPoints, streak }: Pla
   const updateAvatar = useUpdateAvatar();
 
   return (
-    <div className="relative rounded-2xl p-5 gradient-primary neon-glow-purple animate-slide-up overflow-hidden scanline">
-      {/* Motivational phrase */}
-      <p className="text-sm font-semibold text-primary-foreground/90 mb-3 text-center font-display tracking-wide uppercase text-[11px]">
-        {phrase}
-      </p>
+    <div className="rounded-2xl p-5 bg-card border border-border animate-slide-up">
+      <p className="text-xs text-muted-foreground mb-3 text-center">{phrase}</p>
 
       <div className="flex items-center gap-4">
-        {/* Avatar */}
         <button
           onClick={() => setShowAvatars(!showAvatars)}
-          className="text-4xl bg-background/20 rounded-2xl w-18 h-18 flex items-center justify-center hover:scale-105 transition-transform border border-primary-foreground/20 backdrop-blur-sm p-3"
+          className="text-4xl bg-muted rounded-xl w-16 h-16 flex items-center justify-center hover:scale-105 transition-transform"
         >
           {avatar}
         </button>
 
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <Zap className="w-4 h-4 text-neon-yellow" />
-            <span className="font-display font-bold text-sm text-primary-foreground tracking-wide">{level.name}</span>
+            <span className="text-base">{level.emoji}</span>
+            <span className="font-display font-bold text-sm">{level.name}</span>
           </div>
-          <div className="flex items-center gap-3 text-xs text-primary-foreground/80 mb-2">
-            <span className="flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" /> {totalPoints} XP
-            </span>
-            <span className="text-primary-foreground/40">|</span>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+            <TrendingUp className="w-3 h-3 text-primary" />
+            <span>{totalPoints} XP total</span>
+            <span className="text-border">·</span>
             <span>{monthlyPoints} este mês</span>
           </div>
           <div className="flex items-center gap-2">
-            <Progress value={levelProgress} className="h-2 bg-background/30 flex-1" />
-            <span className="text-[10px] font-display font-bold text-primary-foreground/90">{levelProgress}%</span>
+            <Progress value={levelProgress} className="h-1.5 flex-1" />
+            <span className="text-[10px] font-medium text-muted-foreground">{levelProgress}%</span>
           </div>
         </div>
       </div>
 
-      {/* Streak */}
       {streak > 0 && (
-        <div className="mt-3 flex items-center justify-center gap-2 bg-background/20 backdrop-blur-sm rounded-xl py-2 px-4 border border-neon-yellow/20">
-          <Flame className="w-4 h-4 text-neon-yellow animate-glow-pulse" />
-          <span className="font-display font-bold text-xs text-neon-yellow tracking-wide">
-            {streak} {streak === 1 ? "DIA" : "DIAS"} SEGUIDOS
-          </span>
+        <div className="mt-3 flex items-center justify-center gap-2 bg-primary/10 rounded-lg py-1.5 px-3">
+          <Flame className="w-3.5 h-3.5 text-game-warning" />
+          <span className="font-semibold text-xs text-primary">{streak} {streak === 1 ? "dia" : "dias"} seguidos</span>
         </div>
       )}
 
-      {/* Avatar selector */}
       {showAvatars && (
-        <div className="mt-3 grid grid-cols-6 gap-2 bg-background/30 backdrop-blur-sm rounded-xl p-3 border border-primary-foreground/10">
+        <div className="mt-3 grid grid-cols-6 gap-2 bg-muted rounded-xl p-3">
           {AVATARS.map((a) => (
             <button
               key={a}
               onClick={() => { updateAvatar.mutate(a); setShowAvatars(false); }}
-              className={`text-2xl p-2 rounded-lg hover:bg-primary-foreground/20 transition-colors ${a === avatar ? "bg-primary-foreground/30 ring-2 ring-neon-cyan" : ""}`}
+              className={`text-xl p-1.5 rounded-lg hover:bg-secondary transition-colors ${a === avatar ? "bg-secondary ring-1 ring-primary" : ""}`}
             >
               {a}
             </button>
