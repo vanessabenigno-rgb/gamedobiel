@@ -1,99 +1,73 @@
+# Reformulação: Autonomia e Tempo de Telas
 
-# Atualização do Game do Biel - Novas Funcionalidades
+## Diagnóstico do app atual
 
-## 1. Novas Tabelas no Banco de Dados
+**O que existe hoje**
+- Tarefas cadastradas (nome, pontos, dias da semana, categoria, essencial) e geração automática das tarefas do dia.
+- Biel marca "Concluí", a mãe aprova e os pontos são somados.
+- Pontos, níveis, sequência (streak), meta mensal em R$, loja de recompensas, resgates, conquistas e missão semanal.
+- Contagem regressiva até 21h e alertas do navegador.
+- Painel da mãe protegido por PIN (1234).
 
-Criar 4 novas tabelas sem alterar as existentes. Adicionar campos `essential` e `category` na tabela `tasks`.
+**Problemas encontrados**
+- **Não há login.** Qualquer pessoa com o link pode ler e alterar tudo. O PIN é conferido no próprio aparelho e pode ser lido por quem abrir o app — hoje Biel conseguiria aprovar as próprias tarefas. Isso impede cumprir "Gabriel não pode aprovar" e "só a mãe altera regras".
+- O dia é calculado pelo relógio do aparelho, não pelo fuso de Fortaleza.
+- Tarefas "fim de semana" e "única vez" aparecem todos os dias (regra não aplicada).
+- Pontos, níveis, loja, conquistas e R$ contrariam o novo objetivo (sem moedas, lojas ou prêmios).
 
-**Tabela `rewards`** (Recompensas da Loja)
-- id (uuid, PK), name (text), points_required (int), type (text: individual/coletiva), active (boolean, default true)
+**O que dá para reaproveitar**
+- Cadastro de tarefas (vira "Responsabilidades habituais").
+- Tarefas do dia + fluxo marcar/aprovar.
+- Contagem até 21h, alertas, tema visual escuro.
+- Formulário "Nova Missão" e a tela de gerenciar (adaptada para atividades de minutos).
 
-**Tabela `redemptions`** (Resgates)
-- id (uuid, PK), reward_id (uuid, FK -> rewards), date (timestamptz), status (text: pendente/aprovado, default pendente), points_spent (int)
+## Plano de alterações
 
-**Tabela `weekly_missions`** (Missao Semanal)
-- id (uuid, PK), description (text), goal (int), current_progress (int, default 0), active (boolean, default true), completed (boolean, default false), week_start (date)
+### 1. Segurança (necessária para as regras)
+- Criar login com dois perfis: **Mãe (responsável)** e **Gabriel**.
+- Permissões guardadas no servidor: só a mãe aprova, recusa, altera minutos, limites e regras. Gabriel só registra e vê os próprios dados.
+- O PIN deixa de ser usado.
 
-**Tabela `achievements`** (Conquistas/Badges)
-- id (uuid, PK), name (text), description (text), criteria (text), unlocked (boolean, default false), unlocked_at (timestamptz)
+### 2. Tempo de telas
+- 60 min garantidos + até 120 min extras por dia (ambos editáveis pela mãe).
+- Mostrar: conquistados, aguardando aprovação, disponíveis, já usados (a mãe registra o uso).
+- Minutos zeram a cada dia (fuso Fortaleza). O app só registra — não libera aparelhos.
+- Minutos extras ficam "aguardando regularização" enquanto houver pendência escolar do dia.
 
-**Alteracao na tabela `tasks`:**
-- Adicionar coluna `essential` (boolean, default false)
-- Adicionar coluna `category` (text, default 'geral')
+### 3. Minha Escola
+- Registro diário: atividades feitas, pendências, matérias estudadas, dificuldades, "preciso de ajuda".
+- Não gera minutos; a mãe valida.
 
-Todas com RLS public (mesmo padrão das tabelas existentes).
+### 4. Responsabilidades domésticas
+- **Habituais**: tarefas atuais, sem minutos.
+- **Iniciativas espontâneas**: tabela de atividades com minutos editáveis (sugestões iniciais: garrafas +10, lixo +15, louça sem cobrança +20, guardar louça +10, quarto +15, outra necessidade +15).
+- Botão grande **"Registrar minha iniciativa"** (2 cliques: escolher atividade, descrição opcional, enviar). Registro guarda atividade, horário, descrição, minutos previstos e status.
+- Anti-repetição: limite de vezes por dia por atividade (padrão 1, editável) e intervalo mínimo entre registros.
 
-## 2. Loja de Recompensas
+### 5. Validação pela mãe
+- Aprovar, recusar com motivo, ou pedir correção (volta para Gabriel editar).
+- Só aprovadas somam minutos, sempre respeitando o limite diário.
+- Mãe registra "lembretes necessários" com um toque.
 
-**Nova rota `/loja`** com componente `RewardShop.tsx`:
-- Lista de recompensas disponíveis com pontos necessários
-- Botão "Resgatar" que cria um registro em `redemptions` com status "pendente"
-- Indicador visual de pontos disponíveis vs necessários
+### 6. Check-in diário
+- Gabriel responde as 4 perguntas antes das 21h; a mãe visualiza e valida.
 
-**Na tela da mãe:** nova seção "Resgates Pendentes" com botão aprovar (desconta pontos do player_data ao aprovar)
+### 7. Painéis
+- **Gabriel**: responsabilidades do dia, pendências escolares, iniciativas, minutos, tempo disponível, evolução da semana.
+- **Mãe**: resumo do dia, pendências escolares, tarefas feitas, iniciativas, aprovações, tempo autorizado, histórico e indicadores (dias com escola em dia, iniciativas, lembretes, evolução).
 
-**Novos hooks:** `useRewards`, `useRedemptions`, `useRequestRedemption`, `useApproveRedemption`
+### 8. Revisão semanal
+- Tela comum: escola, iniciativas, pendências recorrentes, dias em que cumpriu os combinados, comparação com a semana anterior.
 
-## 3. Missão da Semana
+### 9. O que sai da tela (sem apagar dados)
+- Pontos, níveis, loja, resgates, conquistas, missão semanal e meta em R$ ficam escondidos. Tabelas e registros antigos permanecem guardados.
 
-**Na tela principal:** card mostrando missão ativa com barra de progresso (ex: "Complete 5 dias esta semana - 3/5")
+## Detalhes técnicos
+- Novas tabelas: user_roles (mãe/filho), screen_time_settings, initiative_activities, initiative_logs, school_logs, daily_checkins, screen_time_usage, reminders. Tabelas existentes não são alteradas nem apagadas; apenas as permissões abertas atuais serão substituídas por permissões por perfil (mudança estrutural — precisa da sua aprovação).
+- Cálculo de minutos e limite feito no servidor (função), com índice único para evitar duplicatas.
+- "Dia" calculado em America/Fortaleza no servidor.
 
-**Novos hooks:** `useActiveWeeklyMission`, `useUpdateMissionProgress`
-
-Progresso atualizado automaticamente quando tarefas essenciais do dia são todas aprovadas.
-
-## 4. Sistema de Conquistas (Badges)
-
-**Na tela principal:** seção "Minhas Conquistas" mostrando badges desbloqueados e bloqueados (com ícone de cadeado)
-
-**Conquistas iniciais inseridas via migration:**
-- "3 Dias Seguidos" (streak >= 3)
-- "7 Dias Seguidos" (streak >= 7)
-- "100% Escola na Semana" (todas tarefas escola aprovadas seg-sex)
-- "10 Dias Completos no Mes" (10+ dias com todas essenciais aprovadas)
-
-**Novos hooks:** `useAchievements`, `useCheckAchievements`
-
-Verificacao de conquistas executada ao aprovar tarefas.
-
-## 5. Notificacoes Motivacionais
-
-Usar `sonner` (toast) para notificacoes no app baseadas em hora:
-- **8h:** "Missoes do dia liberadas!"
-- **17h:** "Como esta o progresso hoje?"
-- **20h30:** "Ultima chamada antes das 21h!"
-- **18h sem tarefas:** "Ei, ainda da tempo!"
-
-Implementado via `useEffect` com checagem de hora no `Index.tsx`.
-
-## 6. Tarefas Dinamicas (Tela da Mae)
-
-**Na tela da mae:** botao "Nova Missao" que abre dialog com formulario:
-- Nome, Emoji, Pontos, Categoria, Periodicidade (all/weekdays/weekend/once), Essencial (sim/nao)
-
-Inserir diretamente na tabela `tasks` e invalidar queries.
-
-**Logica de "dia completo":** dia so conta como completo se todas tarefas com `essential=true` estiverem aprovadas.
-
-## 7. Arquivos a Criar/Modificar
-
-| Arquivo | Acao |
-|---|---|
-| Migration SQL | Criar tabelas + alterar tasks |
-| `src/hooks/useGameData.ts` | Adicionar hooks para rewards, redemptions, missions, achievements |
-| `src/pages/Index.tsx` | Adicionar secoes de missao semanal, conquistas, notificacoes |
-| `src/pages/MomDashboard.tsx` | Adicionar resgates pendentes + formulario nova tarefa |
-| `src/pages/RewardShop.tsx` | Nova pagina da loja |
-| `src/components/game/WeeklyMission.tsx` | Componente missao semanal |
-| `src/components/game/AchievementBadges.tsx` | Componente conquistas |
-| `src/components/game/CreateTaskDialog.tsx` | Dialog criar tarefa |
-| `src/components/game/RedemptionCard.tsx` | Card de resgate pendente |
-| `src/App.tsx` | Adicionar rota /loja |
-| `src/lib/game-constants.ts` | Adicionar conquistas default |
-
-## Detalhes Tecnicos
-
-- Todas tabelas novas seguem o padrao existente: RLS public, uuid PK com gen_random_uuid()
-- Hooks seguem padrao react-query existente em useGameData.ts
-- Notificacoes sao client-side (toast baseado em hora), sem push notifications
-- Nenhuma tabela ou campo existente sera removido
+## Decisões que preciso de você
+1. Gabriel terá login próprio (e-mail ou usuário) ou usa o app no mesmo aparelho com perfil selecionado? Recomendo login próprio.
+2. Posso esconder pontos/níveis/loja da tela (dados preservados)?
+3. Quantas vezes por dia cada iniciativa pode ser registrada (padrão: 1)?
