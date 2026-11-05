@@ -1,73 +1,147 @@
-# Welcome to your Lovable project
+# Biel's Daily Quest
 
-## Project info
+Crie um web app simples estilo game chamado "Game do Biel".
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Objetivo:
+Sistema de responsabilidade diária para um adolescente de 12 anos.
 
-## How can I edit this code?
+Regras principais:
 
-There are several ways of editing your application.
+O dia encerra às 21h.
 
-**Use Lovable**
+Tarefas não aprovadas até 21h contam como não concluídas.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Usuário marca como concluído.
 
-Changes made via Lovable will be committed automatically to this repo.
+A mãe precisa aprovar manualmente.
 
-**Use your preferred IDE**
+Só após aprovação os pontos são adicionados.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Funcionalidades obrigatórias:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Tela Principal:
 
-Follow these steps:
+Avatar
+
+Nível
+
+Pontos acumulados no mês
+
+Barra de progresso do dia
+
+Lista de tarefas do dia
+
+Status visual por cor:
+
+Vermelho: pendente
+
+Amarelo: aguardando aprovação
+
+Verde: aprovado
+
+Contador regressivo até 21h
+
+Tela da Mãe:
+
+Lista de tarefas aguardando aprovação
+
+Botão Aprovar
+
+Gráfico semanal de desempenho
+
+Percentual mensal
+
+Visualização de streak
+
+Sistema de Pontuação:
+Tarefas e pontos:
+
+Fazer tarefa da escola (seg-sex): 20 pontos
+
+Banho manhã: 10 pontos
+
+Banho noite: 10 pontos
+
+Escovar dentes manhã: 5 pontos
+
+Escovar dentes noite: 5 pontos
+
+Arrumar quarto: 15 pontos
+
+Lavar louça: 15 pontos
+
+Guardar louça: 10 pontos
+
+Encher garrafas: 10 pontos
+
+Meta mensal:
+2400 pontos = R$60
+
+Recompensa proporcional:
+
+100% = 60
+
+85% = 50
+
+70% = 40
+
+abaixo de 70% = perde benefício
+
+Sistema de níveis:
+Subir de nível a cada 500 pontos.
+Nomes dos níveis:
+
+Iniciante
+
+Guardião da Rotina
+
+Mestre da Disciplina
+
+Braço Direito
+
+Lenda da Casa
+
+Sistema de streak:
+
+3 dias completos seguidos = +30 pontos
+
+7 dias = +100 pontos
+
+15 dias = título especial
+
+Estilo visual:
+
+Interface estilo game
+
+Visual amigável
+
+Barra de progresso animada
+
+Avatar personalizável
+
+Frases motivacionais automáticas
+
+Web app responsivo para celular.
+
+This project was built with [Lovable](https://lovable.dev).
+
+**Live app**: https://gamedobiel.lovable.app
+
+## Build with Lovable
+
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/167c3c37-b18d-48e6-bb68-040b1d6f0a2c).
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+git clone <this-repository-url>
+cd <repository-name>
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
