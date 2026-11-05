@@ -59,6 +59,45 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_checkins: {
+        Row: {
+          id: string
+          improve: string | null
+          initiatives: string | null
+          log_date: string
+          mom_note: string | null
+          pending: string | null
+          school_ok: boolean
+          updated_at: string
+          user_id: string
+          validated: boolean
+        }
+        Insert: {
+          id?: string
+          improve?: string | null
+          initiatives?: string | null
+          log_date?: string
+          mom_note?: string | null
+          pending?: string | null
+          school_ok?: boolean
+          updated_at?: string
+          user_id: string
+          validated?: boolean
+        }
+        Update: {
+          id?: string
+          improve?: string | null
+          initiatives?: string | null
+          log_date?: string
+          mom_note?: string | null
+          pending?: string | null
+          school_ok?: boolean
+          updated_at?: string
+          user_id?: string
+          validated?: boolean
+        }
+        Relationships: []
+      }
       daily_tasks: {
         Row: {
           approved_at: string | null
@@ -66,6 +105,7 @@ export type Database = {
           created_at: string
           date: string
           id: string
+          spontaneous: boolean
           status: string
           task_id: string
         }
@@ -75,6 +115,7 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          spontaneous?: boolean
           status?: string
           task_id: string
         }
@@ -84,6 +125,7 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          spontaneous?: boolean
           status?: string
           task_id?: string
         }
@@ -93,6 +135,86 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      initiative_activities: {
+        Row: {
+          active: boolean
+          created_at: string
+          emoji: string
+          id: string
+          max_per_day: number
+          minutes: number
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          emoji?: string
+          id?: string
+          max_per_day?: number
+          minutes?: number
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          emoji?: string
+          id?: string
+          max_per_day?: number
+          minutes?: number
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      initiative_logs: {
+        Row: {
+          activity_id: string
+          created_at: string
+          description: string | null
+          id: string
+          log_date: string
+          minutes: number
+          mom_note: string | null
+          reviewed_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          log_date?: string
+          minutes?: number
+          mom_note?: string | null
+          reviewed_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          log_date?: string
+          minutes?: number
+          mom_note?: string | null
+          reviewed_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "initiative_logs_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "initiative_activities"
             referencedColumns: ["id"]
           },
         ]
@@ -121,6 +243,24 @@ export type Database = {
           id?: string
           total_points?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          username?: string
         }
         Relationships: []
       }
@@ -156,6 +296,27 @@ export type Database = {
           },
         ]
       }
+      reminders: {
+        Row: {
+          created_at: string
+          id: string
+          log_date: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
       rewards: {
         Row: {
           active: boolean
@@ -177,6 +338,96 @@ export type Database = {
           name?: string
           points_required?: number
           type?: string
+        }
+        Relationships: []
+      }
+      school_logs: {
+        Row: {
+          difficulties: string | null
+          done_activities: string | null
+          has_pending: boolean
+          id: string
+          log_date: string
+          mom_note: string | null
+          needs_help: boolean
+          pending_tasks: string | null
+          subjects: string | null
+          updated_at: string
+          user_id: string
+          validation: string
+        }
+        Insert: {
+          difficulties?: string | null
+          done_activities?: string | null
+          has_pending?: boolean
+          id?: string
+          log_date?: string
+          mom_note?: string | null
+          needs_help?: boolean
+          pending_tasks?: string | null
+          subjects?: string | null
+          updated_at?: string
+          user_id: string
+          validation?: string
+        }
+        Update: {
+          difficulties?: string | null
+          done_activities?: string | null
+          has_pending?: boolean
+          id?: string
+          log_date?: string
+          mom_note?: string | null
+          needs_help?: boolean
+          pending_tasks?: string | null
+          subjects?: string | null
+          updated_at?: string
+          user_id?: string
+          validation?: string
+        }
+        Relationships: []
+      }
+      screen_time_settings: {
+        Row: {
+          base_minutes: number
+          id: string
+          max_extra_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          base_minutes?: number
+          id?: string
+          max_extra_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          base_minutes?: number
+          id?: string
+          max_extra_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      screen_time_usage: {
+        Row: {
+          created_at: string
+          id: string
+          log_date: string
+          minutes: number
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          minutes: number
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          minutes?: number
+          note?: string | null
         }
         Relationships: []
       }
@@ -216,6 +467,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       weekly_missions: {
         Row: {
           active: boolean
@@ -251,10 +520,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      fortaleza_today: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_member: { Args: never; Returns: boolean }
+      is_mom: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "responsavel" | "filho"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -381,6 +659,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["responsavel", "filho"],
+    },
   },
 } as const
