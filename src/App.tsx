@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import ChildDashboard from "./pages/ChildDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import NotFound from "./pages/NotFound";
@@ -18,7 +18,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             <Route path="/entrar" element={<Login />} />
             <Route element={<ProtectedRoute role="filho" />}>
@@ -30,7 +30,7 @@ const App = () => (
             <Route path="/sem-perfil" element={<div className="min-h-screen grid place-items-center p-6 text-center">Acesso criado, mas o perfil familiar ainda não foi configurado.</div>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

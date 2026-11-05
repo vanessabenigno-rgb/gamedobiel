@@ -1,0 +1,45 @@
+name: Publicar no GitHub Pages
+
+on:
+  push:
+    branches: [codex/free-migration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          # Publishable browser credentials; authorization is enforced by Supabase RLS.
+          VITE_SUPABASE_URL: https://gdcpjqiiukpoiknobsyh.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_wxPjXS5bzxcMQhm6EtUm1g_u1RJSwIu
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4
