@@ -23,7 +23,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      # O lockfile original do Lovable contém plataformas incompletas; instalação limpa
+      # resolve os binários corretos do runner Linux sem modificar o repositório.
+      - run: npm install --package-lock=false
       - run: npm run build
         env:
           # Publishable browser credentials; authorization is enforced by Supabase RLS.
