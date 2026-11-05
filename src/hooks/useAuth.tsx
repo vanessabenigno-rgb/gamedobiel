@@ -17,11 +17,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(u);
       if (!u) { setRole(null); setLoading(false); return; }
       const [{ data: r }, { data: p }] = await Promise.all([
-        supabase.from("user_roles").select("role").eq("user_id", u.id),
-        supabase.from("profiles").select("username").eq("id", u.id).maybeSingle(),
+        supabase.from("profiles").select("role").eq("id", u.id).maybeSingle(),
+        supabase.from("profiles").select("display_name").eq("id", u.id).maybeSingle(),
       ]);
-      setRole((r?.[0]?.role as Role) ?? null);
-      setUsername(p?.username ?? "");
+      setRole((r?.role as Role) ?? null);
+      setUsername(p?.display_name ?? "");
       setLoading(false);
     };
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => { setTimeout(() => load(s?.user ?? null), 0); });
